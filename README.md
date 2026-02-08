@@ -52,4 +52,4 @@ https://lukaglyph.github.io/Tactical-Arsenal/
 このプロジェクトは MIT ライセンスの下で公開されています。
 
 ---
-Developed by [Your Name / GitHub ID]
+Developed by [Lukaglyph]
