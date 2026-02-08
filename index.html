@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Tactical Arsenal</title>
+    <title>Tactical Arsenal - Standard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
@@ -12,7 +12,6 @@
         * { -webkit-tap-highlight-color: transparent; touch-action: manipulation; user-select: none; }
         body { background-color: var(--cyber-dark); color: #e2e8f0; font-family: 'Noto Sans JP', sans-serif; overflow: hidden; height: 100dvh; margin: 0; display: flex; flex-direction: column; }
         
-        /* 盤面 */
         .board-grid { display: grid; grid-template-columns: repeat(9, 1fr); gap: 1px; background: rgba(0, 243, 255, 0.2); border: 1px solid #1a1a2e; width: 92vw; height: 92vw; max-width: 70dvh; max-height: 70dvh; margin: 4px auto; }
         .square { background: rgba(10, 10, 20, 0.98); display: flex; align-items: center; justify-content: center; position: relative; }
         .piece { width: 85%; height: 85%; display: flex; align-items: center; justify-content: center; z-index: 10; transition: all 0.2s; position: relative; }
@@ -20,22 +19,16 @@
         .piece.p2 { color: var(--neon-pink); filter: drop-shadow(0 0 4px var(--neon-pink)); transform: rotate(180deg); }
         .piece.promoted { color: var(--neon-gold) !important; filter: drop-shadow(0 0 6px var(--neon-gold)) !important; }
         
-        /* 状態エフェクト */
         .shield-active { outline: 2px solid var(--neon-green); outline-offset: -2px; border-radius: 4px; box-shadow: 0 0 10px var(--neon-green); }
-        .camo-active { opacity: 0.5; animation: stealth-flicker 2s infinite; filter: saturate(0) brightness(1.5); }
-        @keyframes stealth-flicker { 0%, 100% { opacity: 0.3; } 50% { opacity: 0.6; } }
         .stun-active { filter: grayscale(1) brightness(0.5); background: rgba(255, 0, 0, 0.1); }
         .stun-active::after { content: ''; position: absolute; inset: 0; border: 2px solid var(--stun-red); animation: stun-blink 0.5s infinite; border-radius: 4px; }
-        @keyframes stun-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
-
-        /* HUDの修正: 盤面の上に被らない位置（ヘッダー付近）に固定 */
+        
         #unit-hud { 
             position: absolute; top: 45px; left: 50%; transform: translateX(-50%); 
             width: 94%; max-width: 500px; 
             background: rgba(0, 10, 20, 0.9); border: 1px solid var(--neon-blue); 
             padding: 8px 12px; border-radius: 4px; 
-            display: none; align-items: center; gap: 10px; 
-            z-index: 50; pointer-events: none; /* 下の盤面を触れるように */
+            display: none; align-items: center; gap: 10px; z-index: 50; pointer-events: none;
             box-shadow: 0 0 15px rgba(0, 243, 255, 0.4);
         }
 
@@ -51,11 +44,22 @@
 <body>
 
     <div id="mode-screen" class="screen items-center justify-center text-center">
-        <h1 class="text-4xl font-black text-cyan-400 mb-12 tracking-tighter">TACTICAL ARSENAL</h1>
-        <div class="space-y-4 w-full max-w-xs">
-            <button onclick="selectMode('pvp')" class="w-full py-6 border border-cyan-500 text-cyan-500 font-bold hover:bg-cyan-500/10">対人戦 (PVP)</button>
-            <button onclick="selectMode('pve')" class="w-full py-6 border border-pink-500 text-pink-500 font-bold hover:bg-pink-500/10">vs Ultimate AI</button>
+        <h1 class="text-4xl font-black text-cyan-400 mb-2 tracking-tighter italic">TACTICAL ARSENAL</h1>
+        <p class="text-gray-500 text-xs mb-12 uppercase tracking-widest">Digital Tactical Board Game</p>
+        
+        <div class="space-y-6 w-full max-w-xs">
+            <button onclick="selectMode('pvp')" class="w-full py-6 border-2 border-cyan-500 text-cyan-400 group hover:bg-cyan-500/10 transition-all">
+                <div class="text-xl font-bold">対人戦 (2人用)</div>
+                <div class="text-[10px] opacity-60 uppercase">Player vs Player</div>
+            </button>
+            
+            <button onclick="selectMode('pve')" class="w-full py-6 border-2 border-pink-500 text-pink-400 group hover:bg-pink-500/10 transition-all">
+                <div class="text-xl font-bold">CPU戦 (1人用)</div>
+                <div class="text-[10px] opacity-60 uppercase">Single Player vs AI</div>
+            </button>
         </div>
+        
+        <div class="absolute bottom-10 text-[10px] text-gray-600 font-mono">SYSTEM READY // VERSION 1.2.0</div>
     </div>
 
     <div id="config-screen" class="screen hidden">
@@ -70,7 +74,7 @@
             <div class="w-1/3 overflow-y-auto space-y-2" id="unit-list"></div>
             <div class="flex-1 bg-white/5 rounded p-3 overflow-y-auto" id="module-container"></div>
         </main>
-        <button onclick="startGame()" id="start-btn" class="mt-4 py-4 bg-cyan-500 text-black font-black tracking-widest uppercase disabled:opacity-30">Deploy Units</button>
+        <button onclick="startGame()" id="start-btn" class="mt-4 py-4 bg-cyan-500 text-black font-black tracking-widest uppercase disabled:opacity-30">作戦開始</button>
     </div>
 
     <div id="game-screen" class="hidden flex flex-col h-full overflow-hidden relative">
@@ -79,7 +83,6 @@
             <div id="ai-status" class="text-[8px] text-pink-500 animate-pulse hidden uppercase">AI Thinking...</div>
             <div onclick="location.reload()" class="text-[9px] text-red-600 border border-red-900 px-2 font-bold uppercase cursor-pointer">Abort</div>
         </div>
-
         <div id="unit-hud">
             <div id="hud-icon" class="text-cyan-400"></div>
             <div class="flex-1">
@@ -91,7 +94,6 @@
                 <div id="hud-ars-desc" class="text-[8px] text-gray-300 leading-tight"></div>
             </div>
         </div>
-
         <div id="stock-p2" class="stock-area rotate-180"></div>
         <div class="flex-1 flex items-center justify-center"><div id="board" class="board-grid"></div></div>
         <div id="stock-p1" class="stock-area"></div>
@@ -105,11 +107,9 @@
             none: { name: '標準兵装', icon: 'minus-circle', desc: '追加機能なし。コスト0。', cost: 0 },
             shield: { name: 'シールド', icon: 'shield', desc: '一度だけ攻撃を無効化する。', cost: 1 },
             emp: { name: 'EMP', icon: 'zap', desc: '着地時、周囲8マスの敵を麻痺させる。', cost: 2 },
-            booster: { name: 'ブースター', icon: 'wind', desc: '移動後にもう一度行動可能。', cost: 3 },
-            snipe: { name: 'スナイプ', icon: 'target', desc: 'ストライカーの射程が+1強化される。', cost: 2 },
-            gravity: { name: 'グラビティ', icon: 'disc', desc: '着地時、周囲の敵を弾き飛ばす。', cost: 3 },
-            repair: { name: 'リペア', icon: 'plus-square', desc: '着地時、周囲の味方の麻痺を解除。', cost: 2 },
-            camo: { name: 'ステルス', icon: 'eye-off', desc: '移動後、敵からターゲットされなくなる。EMPは有効', cost: 2 }
+            booster: { name: 'ブースター', icon: 'wind', desc: '移動後にもう一度行動可能。(B,R不可)', cost: 3 },
+            snipe: { name: 'スナイプ', icon: 'target', desc: '歩兵の射程が+1強化される。', cost: 2 },
+            gravity: { name: 'グラビティ', icon: 'disc', desc: '着地時、周囲の敵を弾き飛ばす。', cost: 3 }
         };
         const PIECE_ICONS = { P:'chevron-up', L:'arrow-up-to-line', N:'zap', S:'shield', G:'award', B:'crosshair', R:'wind', K:'cpu' };
 
@@ -133,7 +133,15 @@
             Object.keys(MODULES).forEach(k => {
                 const btn = document.createElement('div');
                 btn.className = `mod-btn cursor-pointer mb-2 flex flex-col ${unitArsenalMapping[selectedUnit]===k?'selected':''}`;
-                btn.onclick = () => { unitArsenalMapping[selectedUnit] = k; initUI(); };
+                btn.onclick = () => {
+                    if (k === 'booster' && (selectedUnit === 'B' || selectedUnit === 'R')) {
+                        alert("B(スナイパー)とR(バスター)はブースターを装備できません。");
+                        unitArsenalMapping[selectedUnit] = 'none';
+                    } else {
+                        unitArsenalMapping[selectedUnit] = k;
+                    }
+                    initUI();
+                };
                 btn.innerHTML = `<div class="flex items-center gap-2 mb-1"><i data-lucide="${MODULES[k].icon}" class="w-4 h-4"></i><span class="font-bold text-[11px]">${MODULES[k].name}</span></div><div class="text-[9px] opacity-70 leading-tight">${MODULES[k].desc}</div>`;
                 container.appendChild(btn);
             });
@@ -150,16 +158,16 @@
         function setupSide(p, r1, r2, rP) {
             ['L','N','S','G','K','G','S','N','L'].forEach((t, c) => {
                 const ars = unitArsenalMapping[t] || 'none';
-                board[r1][c] = { type: t, p, stun: 0, promoted: false, ars: ars, shield: (ars==='shield'), camoActive: false };
+                board[r1][c] = { type: t, p, stun: 0, promoted: false, ars: ars, shield: (ars==='shield') };
             });
             ['B','R'].forEach((t, i) => {
                 const col = (p === 1) ? (i === 0 ? 1 : 7) : (i === 0 ? 7 : 1);
                 const ars = unitArsenalMapping[t] || 'none';
-                board[r2][col] = { type: t, p, stun: 0, promoted: false, ars: ars, shield: (ars==='shield'), camoActive: false };
+                board[r2][col] = { type: t, p, stun: 0, promoted: false, ars: ars, shield: (ars==='shield') };
             });
             for(let i=0; i<9; i++) {
                 const ars = unitArsenalMapping['P'] || 'none';
-                board[rP][i] = { type: 'P', p, stun: 0, promoted: false, ars: ars, shield: (ars==='shield'), camoActive: false };
+                board[rP][i] = { type: 'P', p, stun: 0, promoted: false, ars: ars, shield: (ars==='shield') };
             }
         }
 
@@ -172,7 +180,7 @@
                 const p = board[r][c];
                 if(p) {
                     const pEl = document.createElement('div');
-                    pEl.className = `piece p${p.p} ${p.shield ? 'shield-active' : ''} ${p.promoted ? 'promoted' : ''} ${p.camoActive ? 'camo-active' : ''} ${p.stun > 0 ? 'stun-active' : ''}`;
+                    pEl.className = `piece p${p.p} ${p.shield ? 'shield-active' : ''} ${p.promoted ? 'promoted' : ''} ${p.stun > 0 ? 'stun-active' : ''}`;
                     pEl.innerHTML = `<i data-lucide="${PIECE_ICONS[p.type]}"></i>`;
                     sq.appendChild(pEl);
                 }
@@ -185,14 +193,13 @@
             const targetPiece = board[r][c];
             if (selectedStock) {
                 if (!board[r][c]) {
-                    board[r][c] = { type: selectedStock.type, p: turn, stun: 0, promoted: false, ars: 'none', shield: false, camoActive: false };
+                    board[r][c] = { type: selectedStock.type, p: turn, stun: 0, promoted: false, ars: 'none', shield: false };
                     stocks[turn][selectedStock.type]--; selectedStock = null; hideHUD(); nextTurn();
                 }
                 return;
             }
             if (selected) {
                 if (isValid(selected.r, selected.c, r, c)) {
-                    if (targetPiece && targetPiece.p !== turn && targetPiece.camoActive) return;
                     if (targetPiece && targetPiece.p !== turn && targetPiece.shield) {
                         targetPiece.shield = false; log(`Shield Absorbed Attack.`);
                         selected = null; hideHUD(); renderBoard(); nextTurn(); 
@@ -212,11 +219,9 @@
         function executeMove(sr, sc, tr, tc) {
             const p = board[sr][sc];
             board[tr][tc] = p; board[sr][sc] = null;
-            if (p.ars === 'camo') p.camoActive = true;
             if (((p.p === 1 && tr <= 2) || (p.p === 2 && tr >= 6)) && !p.promoted && p.type !== 'K' && p.type !== 'G') {
-                p.promoted = true; p.shield = true;
+                p.promoted = true;
             }
-            // 特殊効果（EMP/Gravity/Repair）
             if (p.ars === 'emp') {
                 for(let i=-1; i<=1; i++) for(let j=-1; j<=1; j++) {
                     let nr=tr+i, nc=tc+j;
@@ -242,7 +247,6 @@
         function isValid(sr, sc, tr, tc) {
             const p = board[sr][sc];
             if (board[tr][tc] && board[tr][tc].p === p.p) return false;
-            if (board[tr][tc] && board[tr][tc].p !== p.p && board[tr][tc].camoActive) return false;
             const dr = tr - sr, dc = tc - sc, s = p.p === 1 ? -1 : 1;
             if (p.ars === 'snipe' && p.type === 'P' && dc === 0 && dr === s * 2) return !board[sr+s][sc];
             if (p.promoted && p.type !== 'R' && p.type !== 'B') return Math.abs(dr) <= 1 && Math.abs(dc) <= 1 && !(dr === -s && Math.abs(dc) === 1);
@@ -281,7 +285,7 @@
             if(gameOver) return; turn = turn === 1 ? 2 : 1; boosterActive = false;
             document.getElementById('turn-display').innerText = `P${turn} PHASE`;
             document.getElementById('turn-display').style.color = turn === 1 ? 'var(--neon-blue)' : 'var(--neon-pink)';
-            board.flat().forEach(p => { if(p && p.p === turn) { p.camoActive = false; if(p.stun > 0) p.stun--; } });
+            board.flat().forEach(p => { if(p && p.p === turn) { if(p.stun > 0) p.stun--; } });
             renderBoard();
             if (isVsAI && turn === 2) { document.getElementById('ai-status').classList.remove('hidden'); setTimeout(runAI, 800); }
         }
@@ -309,7 +313,6 @@
             const mod = MODULES[p.ars];
             const statusEl = document.getElementById('hud-status');
             statusEl.innerHTML = '';
-            if(p.camoActive) statusEl.innerHTML += `<span class="bg-white/20 text-[7px] px-1 rounded text-white animate-pulse border border-white/30">STEALTH</span>`;
             if(p.stun > 0) statusEl.innerHTML += `<span class="bg-red-600 text-[7px] px-1 rounded text-white">STUNNED</span>`;
             if(p.shield) statusEl.innerHTML += `<span class="bg-green-600 text-[7px] px-1 rounded text-white">SHIELD</span>`;
             
